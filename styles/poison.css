@@ -1,0 +1,8 @@
+@keyframes shake {
+  0% { transform: translate(-50%,-50%) scale(1) rotate(0deg); }
+  20% { transform: translate(-50%,-50%) scale(1.05) rotate(-8deg); }
+  40% { transform: translate(-50%,-50%) scale(0.98) rotate(8deg); }
+  60% { transform: translate(-50%,-50%) scale(1.04) rotate(-6deg); }
+  80% { transform: translate(-50%,-50%) scale(1.01) rotate(6deg); }
+  100% { transform: translate(-50%,-50%) scale(0.18) rotate(0deg); }
+}

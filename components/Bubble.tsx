@@ -3,24 +3,21 @@ import React, { useEffect, useState } from "react";
 
 export type BubbleData = {
   id: string;
-  x: number; // percent (0-100)
-  y: number; // percent (0-100)
-  size: number; // px diameter
+  x: number;
+  y: number;
+  size: number;
   points: number;
   color?: string;
+  poison?: boolean;
 };
 
 type Props = {
   bubble: BubbleData;
-  /**
-   * Called when the pop animation finishes and the bubble should be removed + scored.
-   * We call this AFTER playing the pop animation so the user sees the visual feedback.
-   */
-  onPop: (id: string, points: number) => void;
+  onPop: (id: string, points: number, poison?: boolean) => void;
 };
 
 export default function Bubble({ bubble, onPop }: Props): JSX.Element {
-  const { id, x, y, size, color } = bubble;
+  const { id, x, y, size, color, poison } = bubble;
   const [isPopping, setIsPopping] = useState(false);
 
   useEffect(() => {
@@ -30,13 +27,13 @@ export default function Bubble({ bubble, onPop }: Props): JSX.Element {
   }, []);
 
   function handleClick() {
-    if (isPopping) return; // ignore double clicks
+    if (isPopping) return;
     setIsPopping(true);
-
-    // Wait for the pop animation to finish before notifying parent.
-    // Keep this in sync with the CSS transition below (300ms).
+    // Play pop sound
+    const popAudio = new window.Audio('/pop.mp3');
+    popAudio.play();
     window.setTimeout(() => {
-      onPop(id, bubble.points);
+      onPop(id, bubble.points, poison);
     }, 320);
   }
 
@@ -56,20 +53,24 @@ export default function Bubble({ bubble, onPop }: Props): JSX.Element {
         justifyContent: "center",
         cursor: "pointer",
         userSelect: "none",
-        boxShadow: "0 10px 22px rgba(0,0,0,0.12)",
+        boxShadow: poison ? "0 0 0 6px #ff222244, 0 10px 22px rgba(0,0,0,0.12)" : "0 10px 22px rgba(0,0,0,0.12)",
         fontWeight: 800,
         color: "#fff",
         fontSize: Math.max(12, Math.floor(size / 6)),
         background: color ?? "#4aa3ff",
+        border: poison ? "4px solid #ff2222" : undefined,
         transition:
-          "left 220ms linear, top 220ms linear, transform 320ms cubic-bezier(.2,.8,.2,1), opacity 300ms ease",
+          "left 220ms linear, top 220ms linear, transform 320ms cubic-bezier(.2,.8,.2,1), opacity 300ms ease, border-color 220ms",
         willChange: "left, top, transform, opacity",
         opacity: isPopping ? 0 : 1,
         pointerEvents: isPopping ? "none" : "auto",
+        filter: poison ? "drop-shadow(0 0 8px #ff2222)" : undefined,
+        animation: poison && isPopping ? "shake 0.32s" : undefined,
       }}
-      aria-label={`bubble-${id}`}
+      aria-label={`bubble-${id}${poison ? '-poison' : ''}`}
+      title={poison ? 'Poison Bubble! Game Over if clicked.' : undefined}
     >
-      {bubble.points}
+      {poison ? '💀' : bubble.points}
     </div>
   );
 }

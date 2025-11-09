@@ -4,8 +4,8 @@ import Bubble, { BubbleData } from "./Bubble";
 
 type Props = {
   playing: boolean;
-  onScore: (points: number, bubble?: { x: number; y: number }) => void;
-  spawnRate?: number; // ms between spawn attempts
+  onScore: (points: number, bubble?: { x: number; y: number }, poison?: boolean) => void;
+  spawnRate?: number;
   driftInterval?: number;
   upwardBias?: number;
 };
@@ -30,6 +30,9 @@ export default function GameArea({ playing, onScore, spawnRate = 650, driftInter
 
     // Spawn loop
     spawnTimer.current = window.setInterval(() => {
+      // Poison bubble logic
+      const poisonChance = 0.32; // ~32% poison bubbles
+      const isPoison = Math.random() < poisonChance;
       const typeRoll = Math.random();
       let points = 1;
       let size = Math.round(rand(36, 64));
@@ -49,7 +52,6 @@ export default function GameArea({ playing, onScore, spawnRate = 650, driftInter
         color = "#4aa3ff";
       }
 
-      // spawn near bottom-ish so they have space to rise
       const newBubble: BubbleData = {
         id: String(idCounter.current++),
         x: rand(8, 92), // percent
@@ -57,6 +59,7 @@ export default function GameArea({ playing, onScore, spawnRate = 650, driftInter
         size,
         points,
         color,
+        poison: isPoison,
       };
 
       // Before adding, check for overlap with existing bubbles
@@ -148,15 +151,15 @@ export default function GameArea({ playing, onScore, spawnRate = 650, driftInter
   }, [playing, spawnRate, driftInterval, upwardBias]);
 
   // Called by Bubble AFTER its pop animation finishes
-  function handlePop(id: string, points: number) {
-    // award points immediately
+  function handlePop(id: string, points: number, poison?: boolean) {
     const popped = bubbles.find((b) => b.id === id);
-    if (popped) {
+    if (poison) {
+      onScore(-1, { x: popped?.x ?? 0, y: popped?.y ?? 0 }, true);
+    } else if (popped) {
       onScore(points, { x: popped.x, y: popped.y });
     } else {
       onScore(points);
     }
-    // remove bubble
     setBubbles((curr) => curr.filter((b) => b.id !== id));
   }
 

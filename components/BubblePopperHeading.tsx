@@ -7,13 +7,14 @@ export default function BubblePopperHeading(): JSX.Element {
       style={{
         fontSize: "5rem",
         textAlign: "center",
-        marginTop: "3.5rem",
-        fontFamily: "'Segoe UI', Roboto, Arial, sans-serif",
-        background: "linear-gradient(90deg, #ffd966, #ff6b6b)",
-        WebkitBackgroundClip: "text",
-        WebkitTextFillColor: "transparent",
+        fontFamily: "Comic Sans MS, Comic Sans, cursive, sans-serif",
         letterSpacing: "0.03em",
         marginBottom: "1rem",
+        background: "linear-gradient(to right, #dc2626, #facc15, #ec4899)",
+        WebkitBackgroundClip: "text",
+        backgroundClip: "text",
+        WebkitTextFillColor: "transparent",
+        color: "transparent",
       }}
     >
       Bubble Popper Game
