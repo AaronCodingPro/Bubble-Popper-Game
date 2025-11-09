@@ -1,5 +1,7 @@
 // components/Bubble.tsx
 import React, { useEffect, useState } from "react";
+// Add this import for JSX namespace
+import type { JSX } from "react";
 
 export type BubbleData = {
   id: string;
